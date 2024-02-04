@@ -1,20 +1,27 @@
-import { useState } from "react";
-import Post from "./components/Post";
-
-const add = (a, b) => {
-  return a + b;
-};
+import { usePath, useRoutes } from "hookrouter";
+import { Suspense, useEffect } from "react";
+import Routes from "./Routes";
+import LoadingPage from "./components/Common/LoadingPage";
+import MainLayout from "./layouts/mainLayout";
 
 function App() {
-  const [count, setCount] = useState(0);
+  useEffect(() => {
+    console.log(`App...`);
+  }, []);
 
-  return (
-    <main>
-      <Post author="Maximilian" body="React.js is awesome!" />
-      <Post author="Manuel" body="Check out the full course!" />
-      <Post author="Test" body={1} />
-      <Post />
-    </main>
+  const match = useRoutes(Routes);
+  const path = usePath().split("/")[1];
+
+  const isLayoutAuth =
+    path === "login" || path === "check-auth" || path === "consent";
+  const isLayoutMain = !isLayoutAuth;
+
+  return match ? (
+    <Suspense fallback={<LoadingPage />}>
+      {isLayoutMain && <MainLayout>{match}</MainLayout>}
+    </Suspense>
+  ) : (
+    <div>Page Not Found: 404</div>
   );
 }
 
